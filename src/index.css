@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  .diff-highlight {
+    @apply inline-block px-1 py-0.5 rounded text-sm font-medium transition-all duration-200;
+    word-break: break-word;
+  }
+  
+  .diff-highlight:hover {
+    @apply shadow-sm;
+  }
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Ensure proper text rendering */
+.prose {
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+.prose pre {
+  @apply bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700;
+}
+
+/* Prevent layout shifts */
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Prevent text selection on UI elements */
+button, .cursor-pointer {
+  user-select: none;
+}
+
+/* Ensure proper overflow handling */
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Optimize rendering performance */
+.will-change-scroll {
+  will-change: scroll-position;
+}
+
+/* Prevent flickering during scroll */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
