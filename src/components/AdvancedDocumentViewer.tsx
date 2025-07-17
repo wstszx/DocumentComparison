@@ -118,11 +118,27 @@ export const AdvancedDocumentViewer: React.FC<AdvancedDocumentViewerProps> = Rea
     
     // 合并所有页面内容
     let content = processedPages.join('\n');
+          pageContent = beforeContent + highlightedContent + afterContent;
+        }
+      });
+      
+      return `<div class="page-container" data-page="${page.pageNumber}">
+        <div class="page-header">第 ${page.pageNumber} 页</div>
+        <div class="page-content">${pageContent}</div>
+      </div>`;
+    });
+    
+    // 合并所有页面内容
+    let content = processedPages.join('\n');
     
     // 应用搜索高亮
     if (searchTerm.trim()) {
       try {
         const searchRegex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        content = content.replace(searchRegex, '<mark class="search-highlight bg-yellow-200 dark:bg-yellow-800">$1</mark>');
+      } catch (error) {
+        console.warn('Search highlighting failed:', error);
+      }
         content = content.replace(searchRegex, '<mark class="search-highlight bg-yellow-200 dark:bg-yellow-800">$1</mark>');
       } catch (error) {
         console.warn('Search highlighting failed:', error);
