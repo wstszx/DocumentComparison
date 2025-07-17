@@ -75,10 +75,6 @@ export class AdvancedDiffEngine {
         });
         leftLineIndex += (part.value.match(/\n/g) || []).length;
       } else {
-        // 对于未变化的部分，检查是否有词级别的差异
-        const wordDiffs = this.detectWordLevelChanges(part.value, part.value, leftLineIndex, rightLineIndex, leftDoc, rightDoc);
-        differences.push(...wordDiffs);
-        
         const lineCount = (part.value.match(/\n/g) || []).length;
         leftLineIndex += lineCount;
         rightLineIndex += lineCount;
