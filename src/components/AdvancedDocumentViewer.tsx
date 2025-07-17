@@ -36,31 +36,34 @@ export const AdvancedDocumentViewer: React.FC<AdvancedDocumentViewerProps> = Rea
   const processedContent = useMemo(() => {
     if (!document) return 'No content available';
     
-    let content = document.pages.map(page => 
-      `<div class="page-container" data-page="${page.pageNumber}">
-        <div class="page-header">第 ${page.pageNumber} 页</div>
-        <div class="page-content">${page.content}</div>
-      </div>`
-    ).join('\n');
-    
-    // 应用差异高亮
-    if (differences.length > 0) {
-      const sortedDiffs = [...differences]
+    // 处理每个页面的内容
+    const processedPages = document.pages.map(page => {
+      let pageContent = page.content;
+      
+      // 获取当前页面的差异
+      const pageDifferences = differences.filter(diff => {
+        const position = side === 'left' ? diff.leftPosition : diff.rightPosition;
+        return position.page === page.pageNumber;
+      });
+      
+      // 按偏移量倒序排序，从后往前处理避免位置偏移
+      const sortedPageDiffs = [...pageDifferences]
         .filter(diff => {
           const diffContent = side === 'left' ? diff.leftContent : diff.rightContent;
           return diffContent && diffContent.trim().length > 0;
         })
         .sort((a, b) => {
-          const aPos = side === 'left' ? a.leftPosition.absoluteOffset : a.rightPosition.absoluteOffset;
-          const bPos = side === 'left' ? b.leftPosition.absoluteOffset : b.rightPosition.absoluteOffset;
+          const aPos = side === 'left' ? a.leftPosition.offset : a.rightPosition.offset;
+          const bPos = side === 'left' ? b.leftPosition.offset : b.rightPosition.offset;
           return bPos - aPos;
         });
-
-      sortedDiffs.forEach((diff) => {
+      
+      // 应用差异高亮到当前页面
+      sortedPageDiffs.forEach((diff) => {
         const position = side === 'left' ? diff.leftPosition : diff.rightPosition;
         const diffContent = side === 'left' ? diff.leftContent : diff.rightContent;
         
-        if (diffContent && position.absoluteOffset >= 0) {
+        if (diffContent && position.offset >= 0 && position.offset < pageContent.length) {
           let className = 'diff-highlight ';
           switch (diff.type) {
             case 'addition':
@@ -98,19 +101,32 @@ export const AdvancedDocumentViewer: React.FC<AdvancedDocumentViewerProps> = Rea
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
           
-          // 查找并替换内容
-          const regex = new RegExp(diffContent.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-          content = content.replace(regex, 
-            `<span class="${className}" data-diff-id="${diff.id}" data-position="${position.page}-${position.line}-${position.column}">${escapedContent}</span>`
-          );
+          // 使用substring和字符串拼接替代正则表达式替换
+          const beforeContent = pageContent.substring(0, position.offset);
+          const afterContent = pageContent.substring(position.offset + diffContent.length);
+          const highlightedContent = `<span class="${className}" data-diff-id="${diff.id}" data-position="${position.page}-${position.line}-${position.column}">${escapedContent}</span>`;
+          
+          pageContent = beforeContent + highlightedContent + afterContent;
         }
       });
-    }
+      
+      return `<div class="page-container" data-page="${page.pageNumber}">
+        <div class="page-header">第 ${page.pageNumber} 页</div>
+        <div class="page-content">${pageContent}</div>
+      </div>`;
+    });
+    
+    // 合并所有页面内容
+    let content = processedPages.join('\n');
     
     // 应用搜索高亮
     if (searchTerm.trim()) {
-      const searchRegex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      content = content.replace(searchRegex, '<mark class="search-highlight bg-yellow-200 dark:bg-yellow-800">$1</mark>');
+      try {
+        const searchRegex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        content = content.replace(searchRegex, '<mark class="search-highlight bg-yellow-200 dark:bg-yellow-800">$1</mark>');
+      } catch (error) {
+        console.warn('Search highlighting failed:', error);
+      }
     }
     
     return content;
