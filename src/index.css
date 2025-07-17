@@ -20,16 +20,35 @@
 
 @layer components {
   .diff-highlight {
-    @apply inline-block px-1 py-0.5 rounded text-sm font-medium transition-all duration-200;
+    @apply inline-block px-2 py-1 rounded-md text-sm font-medium transition-all duration-200 shadow-sm;
     word-break: break-word;
+    margin: 1px;
   }
   
   .diff-highlight:hover {
-    @apply shadow-sm;
+    @apply shadow-md transform scale-105;
+  }
+  
+  .search-highlight {
+    @apply px-1 py-0.5 rounded font-medium;
+  }
+  
+  .page-container {
+    @apply mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700;
+  }
+  
+  .page-header {
+    @apply text-sm font-medium text-gray-500 dark:text-gray-400 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700;
+  }
+  
+  .page-content {
+    @apply text-gray-900 dark:text-gray-100 leading-relaxed;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 }
 
-/* Custom scrollbar styles */
+/* 自定义滚动条样式 */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -47,7 +66,7 @@
   @apply bg-gray-400 dark:bg-gray-500;
 }
 
-/* Ensure proper text rendering */
+/* 确保文本渲染正确 */
 .prose {
   @apply text-gray-900 dark:text-gray-100;
 }
@@ -56,24 +75,24 @@
   @apply bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700;
 }
 
-/* Prevent layout shifts */
+/* 防止布局偏移 */
 .flex-shrink-0 {
   flex-shrink: 0;
 }
 
-/* Smooth transitions */
+/* 平滑过渡 */
 * {
   transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
 
-/* Prevent text selection on UI elements */
+/* 防止UI元素文本选择 */
 button, .cursor-pointer {
   user-select: none;
 }
 
-/* Ensure proper overflow handling */
+/* 确保正确的溢出处理 */
 .overflow-hidden {
   overflow: hidden;
 }
@@ -83,12 +102,148 @@ button, .cursor-pointer {
   overflow-x: hidden;
 }
 
-/* Optimize rendering performance */
+/* 优化渲染性能 */
 .will-change-scroll {
   will-change: scroll-position;
 }
 
-/* Prevent flickering during scroll */
+/* 防止滚动时闪烁 */
 .scroll-smooth {
   scroll-behavior: smooth;
+}
+
+/* 差异高亮动画 */
+@keyframes highlight-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.diff-highlight.selected {
+  animation: highlight-pulse 2s ease-in-out infinite;
+}
+
+/* 加载动画 */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .page-container {
+    @apply p-4 mb-4;
+  }
+  
+  .diff-highlight {
+    @apply px-1 py-0.5 text-xs;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .page-container {
+    @apply shadow-none border-0;
+    page-break-inside: avoid;
+  }
+  
+  .diff-highlight {
+    @apply shadow-none;
+    border: 1px solid #000 !important;
+  }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .diff-highlight {
+    @apply border-2;
+  }
+  
+  .page-container {
+    @apply border-2;
+  }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+  
+  .scroll-smooth {
+    scroll-behavior: auto;
+  }
+}
+
+/* 焦点可见性 */
+.focus-visible:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
+}
+
+/* 选择样式 */
+::selection {
+  @apply bg-blue-200 dark:bg-blue-800;
+}
+
+/* 工具提示样式 */
+.tooltip {
+  @apply absolute z-50 px-2 py-1 text-xs bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded shadow-lg;
+  pointer-events: none;
+}
+
+/* 模态框样式 */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full mx-4 p-6;
+}
+
+/* 表格样式 */
+.comparison-table {
+  @apply w-full border-collapse;
+}
+
+.comparison-table th,
+.comparison-table td {
+  @apply border border-gray-300 dark:border-gray-600 px-4 py-2 text-left;
+}
+
+.comparison-table th {
+  @apply bg-gray-100 dark:bg-gray-700 font-medium;
+}
+
+/* 状态指示器 */
+.status-indicator {
+  @apply inline-block w-2 h-2 rounded-full mr-2;
+}
+
+.status-indicator.success {
+  @apply bg-green-500;
+}
+
+.status-indicator.warning {
+  @apply bg-yellow-500;
+}
+
+.status-indicator.error {
+  @apply bg-red-500;
+}
+
+.status-indicator.info {
+  @apply bg-blue-500;
 }
